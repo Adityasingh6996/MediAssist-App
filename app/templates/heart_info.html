@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ text.app_title }} - {{ text.heart_info_page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Basic styling, mostly reusing container from index.html */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative; /* Added for language switcher positioning */
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content-section {
+            margin-bottom: 30px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 20px;
+        }
+        .content-section:last-child {
+            border-bottom: none;
+        }
+        .content-section h3 {
+            color: #00796b;
+            font-size: 1.4em;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .content-section ul {
+            list-style-type: disc;
+            margin-left: 25px;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+        .content-section li {
+            margin-bottom: 8px;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .back-link a {
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .back-link a:hover {
+            background-color: #5a6268;
+        }
+        .disclaimer {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .language-switcher {
+            /* Positioned relative to .container */
+            position: absolute; /* Changed from relative/static */
+            top: 20px;
+            right: 20px;
+            text-align: center;
+            margin-bottom: 0; /* Removed existing margin */
+        }
+        .language-switcher a {
+            padding: 5px 10px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #007bff;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .language-switcher a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .language-switcher a.active {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* NEW: Styles for the Heart Risk Assessment Form and Result */
+        .heart-risk-form-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        .heart-risk-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns for labels and inputs */
+            gap: 15px 30px; /* Row gap, column gap */
+            max-width: 600px;
+            margin: 20px auto; /* Center the grid */
+            padding: 20px;
+            background-color: #e6f7ff;
+            border: 1px solid #b3e0ff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left; /* Align content inside the grid to left */
+        }
+        .heart-risk-form label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #0056b3;
+        }
+        .heart-risk-form input[type="number"],
+        .heart-risk-form select {
+            width: calc(100% - 20px); /* Adjust width to account for padding */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .heart-risk-form .form-group {
+            grid-column: span 1; /* Each group takes 1 column */
+        }
+        .heart-risk-form .form-group.full-width {
+            grid-column: span 2; /* Button takes full width */
+            text-align: center;
+        }
+        .heart-risk-form .radio-group label {
+            font-weight: normal; /* Radio labels don't need to be bold */
+            margin-left: 5px;
+            margin-right: 15px;
+            display: inline-block;
+        }
+        .heart-risk-form .radio-group input[type="radio"] {
+            transform: scale(1.1); /* Make radio buttons slightly larger */
+            margin-right: 5px;
+        }
+        .heart-prediction-result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .heart-prediction-result.high-risk {
+            background-color: #f8d7da; /* Light red for high risk */
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .heart-prediction-result.medium-risk {
+            background-color: #ffeeba; /* Light yellow for medium risk */
+            color: #856404;
+            border-color: #ffc107;
+        }
+        /* For flash messages */
+        .flash-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            position: relative; /* Changed to relative for flow */
+            top: 0;
+            left: 0;
+            transform: none; /* Reset transform */
+            width: auto; /* Reset width */
+            min-width: auto; /* Reset min-width */
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-message.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .flash-message.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-switcher">
+            <a href="{{ url_for('set_language', lang='en') }}" class="{% if current_lang == 'en' %}active{% endif %}">English</a>
+            <a href="{{ url_for('set_language', lang='hi') }}" class="{% if current_lang == 'hi' %}active{% endif %}">हिंदी</a>
+        </div>
+
+        <div style="text-align: right; margin-top: -35px; margin-bottom: 20px;">
+            {% if user_name %}
+                <span style="font-weight: bold; color: #0056b3;">{{ text.hello_user_prefix }} {{ user_name }}!</span>
+                <a href="{{ url_for('logout') }}" style="margin-left: 15px; padding: 5px 10px; background-color: #dc3545; color: white; border-radius: 5px; text-decoration: none;">
+                    {{ text.logout_button_text }}
+                </a>
+            {% endif %}
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h1>{{ text.heart_info_page_title }}</h1>
+        <p>{{ text.heart_info_intro }}</p>
+
+        <div class="heart-risk-form-section">
+            <h2>{{ text.heart_risk_heading }}</h2>
+            <p>{{ text.heart_risk_intro }}</p>
+
+            <form action="/predict_heart_disease" method="post" class="heart-risk-form">
+                <div class="form-group">
+                    <label for="age">{{ text.age_label }}</label>
+                    <input type="number" id="age" name="age" required min="1" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="sex">{{ text.sex_label }}</label>
+                    <select id="sex" name="sex" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="Male">{{ text.male_option }}</option>
+                        <option value="Female">{{ text.female_option }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="resting_blood_pressure">{{ text.resting_blood_pressure_label }}</label>
+                    <input type="number" id="resting_blood_pressure" name="resting_blood_pressure" required min="80" max="200">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cholestoral">{{ text.cholesterol_label }}</label>
+                    <input type="number" id="cholestoral" name="cholestoral" required min="100" max="600">
+                </div>
+
+                <div class="form-group">
+                    <label for="Max_heart_rate">{{ text.max_heart_rate_label }}</label>
+                    <input type="number" id="Max_heart_rate" name="Max_heart_rate" required min="60" max="220">
+                </div>
+
+                <div class="form-group">
+                    <label for="oldpeak">{{ text.oldpeak_label }}</label>
+                    <input type="number" id="oldpeak" name="oldpeak" step="0.1" required min="0" max="7">
+                </div>
+
+                <div class="form-group">
+                    <label for="chest_pain_type">{{ text.chest_pain_type_label }}</label>
+                    <select id="chest_pain_type" name="chest_pain_type" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="Typical angina">{{ text.cp_type_typical }}</option>
+                        <option value="Atypical angina">{{ text.cp_type_atypical }}</option>
+                        <option value="Non-anginal pain">{{ text.cp_type_non_anginal }}</option>
+                        <option value="Asymptomatic">{{ text.cp_type_asymptomatic }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fasting_blood_sugar">{{ text.fasting_blood_sugar_label }}</label>
+                    <select id="fasting_blood_sugar" name="fasting_blood_sugar" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="False">{{ text.fbs_false }}</option>
+                        <option value="True">{{ text.fbs_true }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="rest_ecg">{{ text.rest_ecg_label }}</label>
+                    <select id="rest_ecg" name="rest_ecg" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="Normal">{{ text.ecg_normal }}</option>
+                        <option value="ST-T wave abnormality">{{ text.ecg_st_t_abnormality }}</option>
+                        <option value="Left ventricular hypertrophy">{{ text.ecg_lv_hypertrophy }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="exercise_induced_angina">{{ text.exercise_induced_angina_label }}</label>
+                    <select id="exercise_induced_angina" name="exercise_induced_angina" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="No">{{ text.no_option }}</option>
+                        <option value="Yes">{{ text.yes_option }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="slope">{{ text.slope_label }}</label>
+                    <select id="slope" name="slope" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="Upsloping">{{ text.slope_upsloping }}</option>
+                        <option value="Flat">{{ text.slope_flat }}</option>
+                        <option value="Downsloping">{{ text.slope_downsloping }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="vessels_colored_by_flourosopy">{{ text.vessels_colored_label }}</label>
+                    <select id="vessels_colored_by_flourosopy" name="vessels_colored_by_flourosopy" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="Zero">{{ text.vessels_zero }}</option>
+                        <option value="One">{{ text.vessels_one }}</option>
+                        <option value="Two">{{ text.vessels_two }}</option>
+                        <option value="Three">{{ text.vessels_three }}</option>
+                        <option value="Four">{{ text.vessels_four }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="thalassemia">{{ text.thalassemia_label }}</label>
+                    <select id="thalassemia" name="thalassemia" required>
+                        <option value="">{{ text.select_option }}</option>
+                        <option value="Normal">{{ text.thal_normal }}</option>
+                        <option value="Fixed Defect">{{ text.thal_fixed }}</option>
+                        <option value="Reversable Defect">{{ text.thal_reversable }}</option>
+                        <option value="No">{{ text.thal_no }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <button type="submit">{{ text.assess_risk_button }}</button>
+                </div>
+            </form>
+
+            {% if show_heart_result %}
+                <div class="heart-prediction-result {% if 'High' in heart_prediction_text or 'उच्च' in heart_prediction_text %}high-risk{% elif 'Medium' in heart_prediction_text or 'मध्यम' in heart_prediction_text %}medium-risk{% endif %}">
+                    {{ heart_prediction_text }}
+                </div>
+                <div class="disclaimer">
+                    <strong>{{ text.disclaimer_heading }}</strong> {{ text.risk_disclaimer }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="content-section">
+            <h3>{{ text.heart_info_diet_heading }}</h3>
+            <ul>
+                <li>{{ text.heart_info_diet_point1 }}</li>
+                <li>{{ text.heart_info_diet_point2 }}</li>
+                <li>{{ text.heart_info_diet_point3 }}</li>
+                <li>{{ text.heart_info_diet_point4 }}</li>
+                <li>{{ text.heart_info_diet_point5 }}</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h3>{{ text.heart_info_exercise_heading }}</h3>
+            <ul>
+                <li>{{ text.heart_info_exercise_point1 }}</li>
+                <li>{{ text.heart_info_exercise_point2 }}</li>
+                <li>{{ text.heart_info_exercise_point3 }}</li>
+                <li>{{ text.heart_info_exercise_point4 }}</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h3>{{ text.heart_info_lifestyle_heading }}</h3>
+            <ul>
+                <li>{{ text.heart_info_lifestyle_point1 }}</li>
+                <li>{{ text.heart_info_lifestyle_point2 }}</li>
+                <li>{{ text.heart_info_lifestyle_point3 }}</li>
+                <li>{{ text.heart_info_lifestyle_point4 }}</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h3>{{ text.heart_info_emergency_heading }}</h3>
+            <ul>
+                <li>{{ text.heart_info_emergency_point1 }}</li>
+                <li>{{ text.heart_info_emergency_point2 }}</li>
+                <li>{{ text.heart_info_emergency_point3 }}</li>
+                <li>{{ text.heart_info_emergency_point4 }}</li>
+            </ul>
+        </div>
+
+        <div class="back-link">
+            <a href="{{ url_for('home') }}">{{ text.back_to_home }}</a>
+        </div>
+
+        <div class="disclaimer">
+            <strong>{{ text.disclaimer_heading }}</strong> {{ text.disclaimer_text }}
+        </div>
+    </div>
+</body>
+</html>```

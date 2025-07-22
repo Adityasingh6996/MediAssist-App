@@ -1,0 +1,64 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ text.app_title }}</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #0056b3; /* Dark blue background */
+            overflow: hidden; /* Hide scrollbars if animation goes off screen */
+        }
+        .splash-logo {
+            width: 250px; /* Adjust size as needed */
+            height: 250px; /* Adjust size as needed */
+            opacity: 0;
+            transform: scale(0.5);
+            animation: fadeInScale 1.0s ease-out forwards, holdThenFadeOut 3.0s ease-out forwards;
+            animation-delay: 0s, 2s; /* Fade in over 1s, then start fading out at 2s mark over 1s */
+        }
+
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        @keyframes holdThenFadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            66% { /* Hold for 2/3 of 3 seconds = 2 seconds */
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ url_for('static', filename='images/mediassist_logo.png') }}" alt="{{ text.app_title }}" class="splash-logo">
+
+    <script>
+        // Redirect to the main page after 3 seconds
+        setTimeout(function() {
+            window.location.href = "{{ url_for('home') }}";
+        }, 3000); // 3000 milliseconds = 3 seconds
+    </script>
+</body>
+</html>
+```
