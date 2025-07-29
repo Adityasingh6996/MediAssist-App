@@ -39,6 +39,7 @@ In many regions, particularly in India, access to immediate medical consultation
 
 ## Features
 
+
 * **Secure User Authentication:**
     * **Google OAuth 2.0 Login:** Users can securely sign in using their Google accounts.
     * **Animated Splash Screen:** A professional 3-second animated splash screen transitions after successful login.
