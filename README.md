@@ -27,6 +27,7 @@ MediAssist is an intelligent web application designed to empower individuals, es
 
 ## Problem Statement
 
+
 In many regions, particularly in India, access to immediate medical consultation or clear health information can be challenging due to geographical distance, lack of awareness, or language barriers. This project aims to bridge this gap by offering:
 * A preliminary tool for symptom understanding.
 * Actionable information on common diseases.
