@@ -5,7 +5,6 @@
 ![MediAssist Logo Placeholder](app/static/images/mediassist_logo.png)
 *(Replace this with an actual screenshot of your login page, home page, or heart info page after deployment for better visual appeal on GitHub!)*
 
-
 ## Table of Contents
 
 1.  [Introduction](#introduction)
