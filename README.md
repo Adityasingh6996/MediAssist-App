@@ -24,6 +24,7 @@
 
 ## Introduction
 
+
 MediAssist is an intelligent web application designed to empower individuals, especially those in rural or underserved areas, with accessible and preliminary healthcare information. Leveraging machine learning and a user-friendly interface, it provides insights into potential health conditions based on symptoms, offers detailed information about diseases, helps locate nearby clinics, and assesses heart disease risk, all available in multiple languages.
 
 ## Problem Statement
